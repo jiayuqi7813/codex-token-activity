@@ -1,0 +1,34 @@
+name: "Codex Token Activity"
+description: "Generate a GitHub profile SVG from Codex Desktop token activity."
+author: "jiayuqi7813"
+
+branding:
+  icon: "activity"
+  color: "blue"
+
+inputs:
+  codex-token:
+    description: "Bearer token used by Codex Desktop. Store it as a repository secret."
+    required: true
+  output:
+    description: "Path where the generated SVG should be written."
+    required: false
+    default: "assets/codex-token-activity.svg"
+  save-json:
+    description: "Optional path to save the raw API response JSON."
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Generate Codex token activity SVG
+      shell: bash
+      env:
+        CODEX_BEARER_TOKEN: ${{ inputs.codex-token }}
+      run: |
+        args=(--output "${{ inputs.output }}")
+        if [[ -n "${{ inputs.save-json }}" ]]; then
+          args+=(--save-json "${{ inputs.save-json }}")
+        fi
+        python3 "${{ github.action_path }}/scripts/generate_codex_profile_svg.py" "${args[@]}"
