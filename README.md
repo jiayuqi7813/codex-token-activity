@@ -16,6 +16,9 @@ The card shows:
 
 Create a repository secret named `CODEX_BEARER_TOKEN` in the profile repository where you want to generate the SVG.
 
+If you use a repository environment secret, set `environment: production` on the calling workflow job and store the secret in that environment.
+GitHub Actions does not expose environment secrets to a workflow until the job is associated with that environment.
+
 Then add a workflow like this:
 
 ```yaml
@@ -32,6 +35,8 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+    # Optional: if your token is stored in "production" environment secrets
+    # environment: production
     steps:
       - uses: actions/checkout@v4
       - uses: jiayuqi7813/codex-token-activity@main
@@ -68,6 +73,12 @@ python3 scripts/generate_codex_profile_svg.py --demo --output examples/codex-tok
 ## Security
 
 Do not commit your bearer token. Use GitHub Actions secrets or a local environment variable.
+
+If the action is skipped and logs show an empty `CODEX_BEARER_TOKEN`, verify:
+
+- The `codex-token` input is getting a value.
+- The caller workflow has `environment` configured if you use environment secrets.
+- The token value is set in the same repository where the workflow runs.
 
 The generator only uses the token to call:
 
